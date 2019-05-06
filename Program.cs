@@ -1,56 +1,37 @@
 ﻿using System;
-using System.Diagnostics;
-using class_vs_struct.Helper;
-using class_vs_struct.Types;
+using System.Collections.Generic;
+using class_vs_struct.Infrastructure;
+using class_vs_struct.Scenarios;
 
 namespace class_vs_struct
 {
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var iterationCount = 10000000;
-            
-            // Initialization time
-            var classTimer = new Stopwatch();
-            var structTimer = new Stopwatch();
-            
-            classTimer.Start();
-            for (var i = 0; i <= iterationCount; i++)
-            {
-                new PersonClass
-                {
-                    Name = "Name",
-                    Surname = "Surname"
-                };
-            }
-            classTimer.Stop();
-            
-            structTimer.Start();
-            for (var i = 0; i <= iterationCount; i++)
-            {
-                new PersonStruct
-                {
-                    Name = "Name",
-                    Surname = "Surname"
-                };
-            }
-            structTimer.Stop();
+            const int iterationCount = 100000000;
 
-            Console.WriteLine($"struct : {structTimer.ElapsedMilliseconds} ms");
-            Console.WriteLine($"class  : {classTimer.ElapsedMilliseconds} ms");
+            var scenarios = new List<ITestScenario>
+            {
+                new Initialization(iterationCount),
+                new PassAsParameter(iterationCount),
+                new AccessTime(iterationCount),
+                new Size()
+            };
             
-            // Pass as parameters
-            classTimer.Reset();
-            structTimer.Reset();
+            Console.WriteLine($"Executing each test {iterationCount:N1} times");
+            Console.WriteLine("--------------------");
             
-            
-
+            scenarios.ForEach(s =>
+            {
+                var result = s.Run();
+                Console.WriteLine($">> {result.Description.ToUpper()}");
+                Console.WriteLine($"{result.ClassResult.result} {result.ClassResult.resultValue}");
+                Console.WriteLine($"{result.StructResult.result} {result.StructResult.resultValue}");
+                Console.WriteLine($"{result.SimpleStructResult.result} {result.SimpleStructResult.resultValue}");
+            });
 
             // Memory footprint
-
-
-            // Pass as parameter
         }
     }
 }
